@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/DemoProjects/Face/Real-Time_Face_Recognition_Android-master/app/src/main/res/drawable-v24/round_bg.xml" value="0.1555" />
+        <entry key="..\:/DemoProjects/Face/Real-Time_Face_Recognition_Android-master/app/src/main/res/drawable/cross.xml" value="0.1555" />
+        <entry key="..\:/DemoProjects/Face/Real-Time_Face_Recognition_Android-master/app/src/main/res/drawable/ic_baseline_settings_24.xml" value="0.1555" />
+        <entry key="..\:/DemoProjects/Face/Real-Time_Face_Recognition_Android-master/app/src/main/res/drawable/tick.xml" value="0.1555" />
+        <entry key="..\:/DemoProjects/Face/Real-Time_Face_Recognition_Android-master/app/src/main/res/layout/activity_add_face.xml" value="0.24537037037037038" />
+        <entry key="..\:/DemoProjects/Face/Real-Time_Face_Recognition_Android-master/app/src/main/res/layout/activity_main.xml" value="0.23981481481481481" />
+        <entry key="..\:/DemoProjects/Face/Real-Time_Face_Recognition_Android-master/app/src/main/res/layout/activity_main_copy.xml" value="0.24537037037037038" />
+        <entry key="..\:/DemoProjects/Face/Real-Time_Face_Recognition_Android-master/app/src/main/res/layout/activity_splash_screen.xml" value="0.246875" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK" />
+</project>

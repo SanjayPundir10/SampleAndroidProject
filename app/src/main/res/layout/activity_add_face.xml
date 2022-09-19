@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/addView">
+
+        <androidx.camera.view.PreviewView
+            android:id="@+id/previewView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </androidx.camera.view.PreviewView>
+    </FrameLayout>
+
+    <RelativeLayout
+        android:id="@+id/addView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="10dp">
+
+        <ImageButton
+            android:id="@+id/imageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="164dp"
+            android:layout_marginBottom="168dp"
+            android:elevation="2dp"
+            app:srcCompat="@android:drawable/ic_input_add" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="203dp"
+            android:layout_height="200dp"
+            android:background="#2C7E57C2"
+            android:elevation="1dp"
+            tools:srcCompat="@android:drawable/screen_background_light_transparent" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="164dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:hint="Add Face"
+            android:textAlignment="center"
+            android:textColor="@color/purple_500"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="164dp"
+            android:layout_height="165dp"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            tools:text="@string/app_name" />
+    </RelativeLayout>
+
+</RelativeLayout>
