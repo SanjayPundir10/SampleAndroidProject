@@ -5,9 +5,10 @@
       <map>
         <entry key="..\:/DemoProjects/Face/Real-Time_Face_Recognition_Android-master/app/src/main/res/drawable-v24/round_bg.xml" value="0.1555" />
         <entry key="..\:/DemoProjects/Face/Real-Time_Face_Recognition_Android-master/app/src/main/res/drawable/cross.xml" value="0.1555" />
+        <entry key="..\:/DemoProjects/Face/Real-Time_Face_Recognition_Android-master/app/src/main/res/drawable/ic_baseline_crop_free_24.xml" value="0.1555" />
         <entry key="..\:/DemoProjects/Face/Real-Time_Face_Recognition_Android-master/app/src/main/res/drawable/ic_baseline_settings_24.xml" value="0.1555" />
         <entry key="..\:/DemoProjects/Face/Real-Time_Face_Recognition_Android-master/app/src/main/res/drawable/tick.xml" value="0.1555" />
-        <entry key="..\:/DemoProjects/Face/Real-Time_Face_Recognition_Android-master/app/src/main/res/layout/activity_add_face.xml" value="0.24537037037037038" />
+        <entry key="..\:/DemoProjects/Face/Real-Time_Face_Recognition_Android-master/app/src/main/res/layout/activity_add_face.xml" value="0.1" />
         <entry key="..\:/DemoProjects/Face/Real-Time_Face_Recognition_Android-master/app/src/main/res/layout/activity_main.xml" value="0.23981481481481481" />
         <entry key="..\:/DemoProjects/Face/Real-Time_Face_Recognition_Android-master/app/src/main/res/layout/activity_main_copy.xml" value="0.24537037037037038" />
         <entry key="..\:/DemoProjects/Face/Real-Time_Face_Recognition_Android-master/app/src/main/res/layout/activity_splash_screen.xml" value="0.246875" />

@@ -79,7 +79,7 @@ public class AddFaceActivity extends AppCompatActivity {
     ImageView face_preview;
     Interpreter tfLite;
     TextView reco_name, preview_info;
-    ImageButton add_face;
+    TextView add_face;
     CameraSelector cameraSelector;
     boolean start = true, flipX = true;
     Context context = AddFaceActivity.this;
@@ -107,7 +107,7 @@ public class AddFaceActivity extends AppCompatActivity {
         face_preview = findViewById(R.id.imageView);
         reco_name = findViewById(R.id.textView);
         preview_info = findViewById(R.id.textView2);
-        add_face = findViewById(R.id.imageButton);
+        add_face = findViewById(R.id.add_face);
 
         preview_info.setText("1.Bring Face in view of Camera.\n\n2.Your Face preview will appear here.\n\n3.Click Add button to save face.");
 
