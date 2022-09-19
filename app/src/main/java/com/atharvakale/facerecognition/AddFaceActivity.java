@@ -26,9 +26,11 @@ import android.text.InputType;
 import android.util.Log;
 import android.util.Pair;
 import android.util.Size;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,7 +78,7 @@ public class AddFaceActivity extends AppCompatActivity {
 
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     PreviewView previewView;
-    ImageView face_preview;
+    ImageView face_preview, capture;
     Interpreter tfLite;
     TextView reco_name, preview_info;
     TextView add_face;
@@ -105,6 +107,7 @@ public class AddFaceActivity extends AppCompatActivity {
         registered = readFromSP(); //Load saved faces from memory when app starts
         setContentView(R.layout.activity_add_face);
         face_preview = findViewById(R.id.imageView);
+        capture = findViewById(R.id.capture);
         reco_name = findViewById(R.id.textView);
         preview_info = findViewById(R.id.textView2);
         add_face = findViewById(R.id.add_face);
@@ -116,6 +119,7 @@ public class AddFaceActivity extends AppCompatActivity {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_REQUEST_CODE);
         }
 
+        capture.setOnClickListener(v -> start = false);
         add_face.setOnClickListener((v -> addFace()));
 
         //Load model
@@ -307,11 +311,14 @@ public class AddFaceActivity extends AppCompatActivity {
                 final String name = nearest.first;
                 distance = nearest.second;
                 Log.e("nearest", nearest.toString());
-                if (distance < 1.000f) {//If distance between Closest found face is more than 1.000 ,then output UNKNOWN face.
-                    reco_name.setText(name);
-                    Toast.makeText(context, name + "'s Face verified", Toast.LENGTH_SHORT).show();
+                LinearLayout toast = findViewById(R.id.toast);
+                TextView msg = findViewById(R.id.msg);
+                if (distance < 1.000f) {
+                    msg.setText(name + " is already added");
+                    toast.setVisibility(View.VISIBLE);
+                    toast.bringToFront();
                 }
-                System.out.println("nearest: " + name + " - distance: " + distance);
+                new Handler().postDelayed(() -> toast.setVisibility(View.GONE), 3000);
             }
         }
 

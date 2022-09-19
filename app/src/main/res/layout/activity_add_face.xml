@@ -7,6 +7,33 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <LinearLayout
+        android:id="@+id/toast"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/white"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/sts"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:src="@drawable/tick" />
+
+        <TextView
+            android:id="@+id/msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="message show heres grgetb ter tew wst wst "
+            android:textColor="@color/black"
+            android:textSize="20sp" />
+
+    </LinearLayout>
+
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
@@ -16,22 +43,22 @@
         <androidx.camera.view.PreviewView
             android:id="@+id/previewView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent" />
 
-        </androidx.camera.view.PreviewView>
+        <ImageView
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_gravity="center"
+            android:src="@drawable/crop" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center">
-
-            <ImageView
-                android:layout_width="300dp"
-                android:layout_height="300dp"
-                android:src="@drawable/crop" />
-
-
-        </LinearLayout>
+        <ImageView
+            android:id="@+id/capture"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="bottom|center"
+            android:layout_margin="5dp"
+            android:src="@drawable/ic_twotone_camera_24"
+            app:tint="@color/white" />
 
     </FrameLayout>
 
@@ -48,13 +75,17 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_below="@id/imageView"
-            android:layout_margin="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
             android:background="@drawable/round_bg"
+            android:backgroundTint="@color/green"
             android:gravity="center"
-            android:padding="5dp"
+            android:padding="8dp"
             android:text="Add details"
             android:textAllCaps="true"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textSize="16sp" />
 
         <ImageView

@@ -71,9 +71,12 @@ import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.ReadOnlyBufferException;
 import java.nio.channels.FileChannel;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -89,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
     Context context = MainActivity.this;
     int cam_face = CameraSelector.LENS_FACING_FRONT; //Default Back Camera
 
-    LinearLayout toast;
+    LinearLayout toast, dateView;
     int[] intValues;
     int inputSize = 112;  //Input size for model
     boolean isModelQuantized = false;
@@ -102,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
 
     String modelFile = "mobile_face_net.tflite"; //model name
     private HashMap<String, SimilarityClassifier.Recognition> registered = new HashMap<>(); //saved Faces
+    private Handler handlerDate = new Handler();
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -111,8 +115,26 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         ImageView actions = findViewById(R.id.action);
+        TextView time = findViewById(R.id.time);
+        TextView date = findViewById(R.id.date);
         toast = findViewById(R.id.toast);
-        toast.bringToFront();
+        dateView = findViewById(R.id.dateView);
+        dateView.bringToFront();
+
+        //current dat and time
+        time.setText(new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date()));
+        date.setText(new SimpleDateFormat("yyyy-MM-dd EEE", Locale.getDefault()).format(new Date()));
+
+        handlerDate = new Handler();
+        handlerDate.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                time.setText(new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date()));
+                date.setText(new SimpleDateFormat("yyyy-MM-dd EEE", Locale.getDefault()).format(new Date()));
+                handlerDate.postDelayed(this, 1000);
+            }
+        }, 2000);
+
 
         //Camera Permission
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -122,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
         //On-screen Action Button
         actions.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Select Action:");
+            builder.setTitle("Setting");
             //String[] names = {"View Recognition List", "Delete Recognition List", "Save Recognitions", "Load Recognitions", "Clear All Recognitions", "Import Photo (Beta)"};
             String[] names = {"Add Face", "View Recognition List", "Delete Recognition List", "Save Recognitions", "Load Recognitions", "Clear All Recognitions"};
             builder.setItems(names, (dialog, which) -> {
@@ -373,19 +395,16 @@ public class MainActivity extends AppCompatActivity {
 
                 ImageView sts = findViewById(R.id.sts);
                 TextView msg = findViewById(R.id.msg);
-
                 if (distance < 1.000f) {
                     sts.setImageResource(R.drawable.tick);
-                    msg.setText("");
-                    msg.setText(name+" 's Face verified");
+                    msg.setText(name + " 's Face verified");
                 } else {
                     sts.setImageResource(R.drawable.cross);
                     msg.setText("Unknown Face");
                 }
                 toast.setVisibility(View.VISIBLE);
-                new Handler().postDelayed(() -> {
-                    toast.setVisibility(View.GONE);
-                }, 3000);
+                toast.bringToFront();
+                new Handler().postDelayed(() -> toast.setVisibility(View.GONE), 5000);
             }
         }
 
@@ -601,6 +620,14 @@ public class MainActivity extends AppCompatActivity {
         }
         Toast.makeText(context, "Recognitions Loaded", Toast.LENGTH_SHORT).show();
         return retrievedMap;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(handlerDate!=null){
+            handlerDate.removeCallbacksAndMessages(null);
+        }
     }
 }
 
