@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
     String modelFile = "mobile_face_net.tflite"; //model name
     private HashMap<String, SimilarityClassifier.Recognition> registered = new HashMap<>(); //saved Faces
     private Handler handlerDate = new Handler();
+    private DBHelper myDb;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -113,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         registered = readFromSP(); //Load saved faces from memory when app starts
         setContentView(R.layout.activity_main);
+        myDb = new DBHelper(this);
 
         ImageView actions = findViewById(R.id.action);
         TextView time = findViewById(R.id.time);
@@ -391,13 +393,19 @@ public class MainActivity extends AppCompatActivity {
             if (nearest != null) {
                 final String name = nearest.first;
                 distance = nearest.second;
-                Log.e("nearest", nearest.toString());
 
                 ImageView sts = findViewById(R.id.sts);
                 TextView msg = findViewById(R.id.msg);
                 if (distance < 1.000f) {
-                    sts.setImageResource(R.drawable.tick);
-                    msg.setText(name + " 's Face verified");
+                    String[] arr = name.split("&");
+                    if (arr.length > 1) {
+                        sts.setImageResource(R.drawable.tick);
+                        msg.setText(arr[0] + " : " + arr[1] + " 's Face verified");
+                        myDb.insertData(arr[0], arr[1]);
+                    } else {
+                        sts.setImageResource(R.drawable.cross);
+                        msg.setText("Unknown Face");
+                    }
                 } else {
                     sts.setImageResource(R.drawable.cross);
                     msg.setText("Unknown Face");
@@ -407,7 +415,6 @@ public class MainActivity extends AppCompatActivity {
                 new Handler().postDelayed(() -> toast.setVisibility(View.GONE), 5000);
             }
         }
-
     }
 
     //Compare Faces by distance between face embeddings
@@ -625,7 +632,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(handlerDate!=null){
+        if (handlerDate != null) {
             handlerDate.removeCallbacksAndMessages(null);
         }
     }

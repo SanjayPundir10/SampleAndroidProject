@@ -3,7 +3,9 @@ package com.atharvakale.facerecognition;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -26,7 +28,9 @@ import android.text.InputType;
 import android.util.Log;
 import android.util.Pair;
 import android.util.Size;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -66,6 +70,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.ReadOnlyBufferException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,6 +104,7 @@ public class AddFaceActivity extends AppCompatActivity {
 
     String modelFile = "mobile_face_net.tflite"; //model name
     private HashMap<String, SimilarityClassifier.Recognition> registered = new HashMap<>(); //saved Faces
+    private DBHelper myDb;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -106,6 +112,7 @@ public class AddFaceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         registered = readFromSP(); //Load saved faces from memory when app starts
         setContentView(R.layout.activity_add_face);
+        myDb = new DBHelper(this);
         face_preview = findViewById(R.id.imageView);
         capture = findViewById(R.id.capture);
         reco_name = findViewById(R.id.textView);
@@ -139,27 +146,44 @@ public class AddFaceActivity extends AppCompatActivity {
     private void addFace() {
         start = false;
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Enter Name");
-        // Set up the input
-        final EditText input = new EditText(context);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
+        builder.setTitle("Employee Detail");
+        View dialogView = this.getLayoutInflater().inflate(R.layout.row_add_details, null);
+        builder.setView(dialogView);
+        EditText eID = dialogView.findViewById(R.id.id);
+        EditText eName = dialogView.findViewById(R.id.name);
         builder.setPositiveButton("ADD", (dialog, which) -> {
-            //Create and Initialize new object with Face embeddings and Name.
-            SimilarityClassifier.Recognition result = new SimilarityClassifier.Recognition("0", "", -1f);
-            result.setExtra(embeedings);
-            registered.put(input.getText().toString(), result);
-            insertToSP(registered, false);
-
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                    finish();
+            if (eID.getText().toString().trim().isEmpty()) {
+                Toast.makeText(context, "Enter employee id", Toast.LENGTH_SHORT).show();
+            } else if (eName.getText().toString().trim().isEmpty()) {
+                Toast.makeText(context, "Enter employee name", Toast.LENGTH_SHORT).show();
+            } else {
+                boolean isMatch = false;
+                for (int i = 0; i < registered.size(); i++) {
+                    final Pair<String, Float> nearest = findNearest(embeedings[0]);//Find closest matching face
+                    if (nearest != null) {
+                        final String name = nearest.first;
+                        String[] arr = name.split("&");
+                        if (arr[0].equals(eID.getText().toString().trim())) {
+                            isMatch = true;
+                        }
+                    }
                 }
-            }, 1000);
 
+                if (isMatch) {
+                    Toast.makeText(context, "Employee id already exists", Toast.LENGTH_SHORT).show();
+                } else {
+                    SimilarityClassifier.Recognition result = new SimilarityClassifier.Recognition("0", "", -1f);
+                    result.setExtra(embeedings);
+                    String name = eID.getText().toString() + "&" + eName.getText().toString();
+                    registered.put(name, result);
+                    AddFaceActivity.this.insertToSP(registered, false);
+                    myDb.insertData(eID.getText().toString(), eName.getText().toString());
+                    new Handler().postDelayed(() -> {
+                        AddFaceActivity.this.startActivity(new Intent(AddFaceActivity.this.getApplicationContext(), MainActivity.class));
+                        AddFaceActivity.this.finish();
+                    }, 1000);
+                }
+            }
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> {
             dialog.cancel();
@@ -314,9 +338,12 @@ public class AddFaceActivity extends AppCompatActivity {
                 LinearLayout toast = findViewById(R.id.toast);
                 TextView msg = findViewById(R.id.msg);
                 if (distance < 1.000f) {
-                    msg.setText(name + " is already added");
-                    toast.setVisibility(View.VISIBLE);
-                    toast.bringToFront();
+                    String[] arr = name.split("&");
+                    if (arr.length > 1) {
+                        msg.setText(arr[1] + " is already added");
+                        toast.setVisibility(View.VISIBLE);
+                        toast.bringToFront();
+                    }
                 }
                 new Handler().postDelayed(() -> toast.setVisibility(View.GONE), 3000);
             }
@@ -389,8 +416,7 @@ public class AddFaceActivity extends AppCompatActivity {
         return resultBitmap;
     }
 
-    private static Bitmap rotateBitmap(
-            Bitmap bitmap, int rotationDegrees, boolean flipX, boolean flipY) {
+    private static Bitmap rotateBitmap(Bitmap bitmap, int rotationDegrees, boolean flipX, boolean flipY) {
         Matrix matrix = new Matrix();
 
         // Rotate the image back to straight.
