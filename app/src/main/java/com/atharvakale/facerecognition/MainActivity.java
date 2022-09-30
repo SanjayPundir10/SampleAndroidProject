@@ -5,6 +5,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -47,6 +48,7 @@ import com.google.mlkit.vision.face.FaceDetectorOptions;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.view.PreviewView;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
 import android.os.Handler;
@@ -55,6 +57,9 @@ import android.util.Pair;
 import android.util.Size;
 
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -137,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 2000);
 
-
         //Camera Permission
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_REQUEST_CODE);
@@ -145,12 +149,38 @@ public class MainActivity extends AppCompatActivity {
 
         //On-screen Action Button
         actions.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Setting");
-            //String[] names = {"View Recognition List", "Delete Recognition List", "Save Recognitions", "Load Recognitions", "Clear All Recognitions", "Import Photo (Beta)"};
-            String[] names = {"Add Face", "View Recognition List", "Delete Recognition List", "Save Recognitions", "Load Recognitions", "Clear All Recognitions"};
-            builder.setItems(names, (dialog, which) -> {
-                switch (which) {
+            final Dialog dialog = new Dialog(this);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.setCancelable(true);
+            dialog.setContentView(R.layout.row_menu_list);
+            dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+            dialog.getWindow().setDimAmount(1f);
+
+            ImageButton close = dialog.findViewById(R.id.close);
+            CardView addUser = dialog.findViewById(R.id.addUser);
+            CardView viewUser = dialog.findViewById(R.id.viewUser);
+            CardView viewLogs = dialog.findViewById(R.id.viewLogs);
+            CardView settings = dialog.findViewById(R.id.settings);
+
+            close.setOnClickListener(v1 -> dialog.dismiss());
+            addUser.setOnClickListener(v1 -> {
+                startActivity(new Intent(context, AddFaceActivity.class));
+                dialog.dismiss();
+            });
+            viewUser.setOnClickListener(v1 -> {
+                displaynameListview();
+                dialog.dismiss();
+            });
+            viewLogs.setOnClickListener(v1 -> {
+                Toast.makeText(context, "Coming Soon", Toast.LENGTH_SHORT).show();
+            });
+            settings.setOnClickListener(v1 -> {
+                Toast.makeText(context, "Coming Soon", Toast.LENGTH_SHORT).show();
+            });
+            dialog.show();
+
+            /*String[] names = {"Add Face", "View Recognition List", "Delete Recognition List",
+                               "Save Recognitions", "Load Recognitions", "Clear All Recognitions"};
                     case 0:
                         startActivity(new Intent(this, AddFaceActivity.class));
                         break;
@@ -169,10 +199,7 @@ public class MainActivity extends AppCompatActivity {
                     case 5:
                         clearnameList();
                         break;
-                }
-            });
-            AlertDialog dialog = builder.create();
-            dialog.show();
+                */
         });
 
         //Load model
@@ -246,7 +273,7 @@ public class MainActivity extends AppCompatActivity {
         boolean[] checkedItems = new boolean[registered.size()];
         int i = 0;
         for (Map.Entry<String, SimilarityClassifier.Recognition> entry : registered.entrySet()) {
-            names[i] = entry.getKey();
+            names[i] = entry.getKey().replace("&", " ");
             checkedItems[i] = false;
             i = i + 1;
         }
@@ -410,7 +437,8 @@ public class MainActivity extends AppCompatActivity {
                     sts.setImageResource(R.drawable.cross);
                     msg.setText("Unknown Face");
                 }
-                toast.setVisibility(View.VISIBLE);
+                if (toast.getVisibility() == View.GONE)
+                    toast.setVisibility(View.VISIBLE);
                 toast.bringToFront();
                 new Handler().postDelayed(() -> toast.setVisibility(View.GONE), 5000);
             }

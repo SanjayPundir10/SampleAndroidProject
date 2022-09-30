@@ -559,7 +559,6 @@ public class AddFaceActivity extends AppCompatActivity {
             entry.getValue().setExtra(output);
 
         }
-        Toast.makeText(context, "Recognitions Loaded", Toast.LENGTH_SHORT).show();
         return retrievedMap;
     }
 
