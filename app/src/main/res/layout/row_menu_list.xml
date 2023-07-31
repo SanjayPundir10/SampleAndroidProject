@@ -109,7 +109,7 @@
                     android:minLines="2"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
-                    android:text="View User"
+                    android:text="View/Delete User"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
 

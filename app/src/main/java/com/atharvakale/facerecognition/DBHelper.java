@@ -7,8 +7,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "faceData.db";
@@ -24,7 +28,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createTable = "CREATE TABLE IF NOT EXISTS " + tableLogs + "(id INTEGER PRIMARY KEY autoincrement,empId TEXT,empName TEXT,dateTime TEXT);";
+        String createTable = "CREATE TABLE IF NOT EXISTS " + tableLogs + "(id INTEGER PRIMARY KEY autoincrement,empId TEXT,empName TEXT,dateTime DATE);";
         db.execSQL(createTable);
     }
 
@@ -45,6 +49,23 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    public List<Map<String, String>> getUserData(String emp) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<Map<String, String>> list = new ArrayList<>();
+        String query = "select * from tableLogs where empId=" + emp + " order by id desc";
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            do {
+                Map<String, String> map = new HashMap<>();
+                map.put("Id", cursor.getString(cursor.getColumnIndex(empId)));
+                map.put("name", cursor.getString(cursor.getColumnIndex(empName)));
+                map.put("date", cursor.getString(cursor.getColumnIndex(dateTime)));
+                list.add(map);
+            } while (cursor.moveToNext());
+        }
+        return list;
+    }
+
     public Cursor getAllData() {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("select * from  TABLE_QUESTIONS", null);
@@ -61,7 +82,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public Integer deleteAllData(String examId) {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete(tableLogs, "ExamId = ?", new String[]{examId});
+        return db.delete(tableLogs, "empId = ?", new String[]{examId});
     }
 
 }

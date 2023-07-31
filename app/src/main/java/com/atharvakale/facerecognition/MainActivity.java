@@ -1,5 +1,7 @@
 package com.atharvakale.facerecognition;
 
+import static com.atharvakale.facerecognition.Constant.OUTPUT_SIZE;
+
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -104,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
     float[][] embeedings;
     float IMAGE_MEAN = 128.0f;
     float IMAGE_STD = 128.0f;
-    int OUTPUT_SIZE = 192; //Output size of model
     ProcessCameraProvider cameraProvider;
     private static final int MY_CAMERA_REQUEST_CODE = 100;
 
@@ -168,11 +169,12 @@ public class MainActivity extends AppCompatActivity {
                 dialog.dismiss();
             });
             viewUser.setOnClickListener(v1 -> {
-                displaynameListview();
+                deleteSelectedUser();
                 dialog.dismiss();
             });
             viewLogs.setOnClickListener(v1 -> {
-                Toast.makeText(context, "Coming Soon", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(context, LogsActivity.class));
+                dialog.dismiss();
             });
             settings.setOnClickListener(v1 -> {
                 Toast.makeText(context, "Coming Soon", Toast.LENGTH_SHORT).show();
@@ -223,45 +225,54 @@ public class MainActivity extends AppCompatActivity {
             registered.clear();
             Toast.makeText(context, "Recognitions Cleared", Toast.LENGTH_SHORT).show();
         });
-        insertToSP(registered, true);
+        insertToSP(registered, 1);
         builder.setNegativeButton("Cancel", null);
         AlertDialog dialog = builder.create();
         dialog.show();
     }
 
-    private void updatenameListview() {
+    private void deleteSelectedUser() {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         if (registered.isEmpty()) {
             builder.setTitle("No Faces Added!!");
             builder.setPositiveButton("OK", null);
         } else {
             builder.setTitle("Select Recognition to delete:");
-            // add a checkbox list
             String[] names = new String[registered.size()];
+            String[] namesShow = new String[registered.size()];
             boolean[] checkedItems = new boolean[registered.size()];
             int i = 0;
             for (Map.Entry<String, SimilarityClassifier.Recognition> entry : registered.entrySet()) {
+                String[] user = entry.getKey().split("&");
+                if (user.length > 1) {
+                    namesShow[i] = user[0] + " " + user[1];
+                } else {
+                    namesShow[i] = entry.getKey();
+                }
                 names[i] = entry.getKey();
                 checkedItems[i] = false;
                 i = i + 1;
             }
-
-            builder.setMultiChoiceItems(names, checkedItems, (dialog, which, isChecked) -> checkedItems[which] = isChecked);
+            builder.setMultiChoiceItems(namesShow, checkedItems, (dialog, which, isChecked) -> checkedItems[which] = isChecked);
             builder.setPositiveButton("OK", (dialog, which) -> {
-                for (int i1 = 0; i1 < checkedItems.length; i1++) {
-                    if (checkedItems[i1]) {
-                        registered.remove(names[i1]);
+                for (int j = 0; j < checkedItems.length; j++) {
+                    if (checkedItems[j]) {
+                        registered.remove(names[j]);
                     }
                 }
-                Toast.makeText(context, "Recognitions Deleted", Toast.LENGTH_SHORT).show();
+                insertToSP(registered, 2);
+                Toast.makeText(context, "Selected User Deleted", Toast.LENGTH_SHORT).show();
             });
             builder.setNegativeButton("Cancel", null);
-            AlertDialog dialog = builder.create();
-            dialog.show();
         }
+        AlertDialog dialog = builder.create();
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setDimAmount(1f);
+        dialog.show();
     }
 
-    private void displaynameListview() {
+    private void ViewAllUsers() {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         if (registered.isEmpty())
             builder.setTitle("No Faces Added!!");
@@ -281,6 +292,9 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton("OK", (dialog, which) -> {
         });
         AlertDialog dialog = builder.create();
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setDimAmount(1f);
         dialog.show();
     }
 
@@ -620,10 +634,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Save Faces to Shared Preferences.Conversion of Recognition objects to json string
-    private void insertToSP(HashMap<String, SimilarityClassifier.Recognition> jsonMap, boolean clear) {
-        if (clear)
+    // private void insertToSP(HashMap<String, SimilarityClassifier.Recognition> jsonMap, boolean clear) {
+    private void insertToSP(HashMap<String, SimilarityClassifier.Recognition> jsonMap, int mode) {
+        //mode: 0:save all, 1:clear all, 2:update all
+        if (mode == 1)
             jsonMap.clear();
-        else
+        else if (mode == 0)
             jsonMap.putAll(readFromSP());
         String jsonString = new Gson().toJson(jsonMap);
         SharedPreferences sharedPreferences = getSharedPreferences("HashMap", MODE_PRIVATE);

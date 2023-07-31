@@ -1,5 +1,7 @@
 package com.atharvakale.facerecognition;
 
+import static com.atharvakale.facerecognition.Constant.OUTPUT_SIZE;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -98,7 +100,6 @@ public class AddFaceActivity extends AppCompatActivity {
     float[][] embeedings;
     float IMAGE_MEAN = 128.0f;
     float IMAGE_STD = 128.0f;
-    int OUTPUT_SIZE = 192; //Output size of model
     ProcessCameraProvider cameraProvider;
     private static final int MY_CAMERA_REQUEST_CODE = 100;
 
