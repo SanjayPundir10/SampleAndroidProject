@@ -78,6 +78,8 @@ import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.ReadOnlyBufferException;
 import java.nio.channels.FileChannel;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -88,6 +90,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
     FaceDetector detector;
@@ -437,12 +440,35 @@ public class MainActivity extends AppCompatActivity {
 
                 ImageView sts = findViewById(R.id.sts);
                 TextView msg = findViewById(R.id.msg);
+
+                boolean show = false;
                 if (distance < 1.000f) {
                     String[] arr = name.split("&");
                     if (arr.length > 1) {
-                        sts.setImageResource(R.drawable.tick);
-                        msg.setText(arr[0] + " : " + arr[1] + " 's Face verified");
-                        myDb.insertData(arr[0], arr[1]);
+                        SharedPreferences sharedPreferences = getSharedPreferences("HashMap", MODE_PRIVATE);
+                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                        String strDate = sharedPreferences.getString(arr[0] + arr[1], "");
+                        long diffInSec = -1;//no saved data
+                        if (!strDate.equals("")) {
+                            Date curDate, savedDate;
+                            try {
+                                curDate = df.parse(df.format(new Date()));
+                                savedDate = df.parse(strDate);
+                                long diffInMs = curDate.getTime() - savedDate.getTime();
+                                diffInSec = TimeUnit.MILLISECONDS.toMinutes(diffInMs);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        if (diffInSec > 1 || diffInSec == -1) {
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString(arr[0] + arr[1], df.format(new Date()));
+                            editor.apply();
+                            show = true;
+                            sts.setImageResource(R.drawable.tick);
+                            msg.setText(arr[0] + " : " + arr[1] + " 's Face verified");
+                            myDb.insertData(arr[0], arr[1]);
+                        }
                     } else {
                         sts.setImageResource(R.drawable.cross);
                         msg.setText("Unknown Face");
@@ -451,10 +477,11 @@ public class MainActivity extends AppCompatActivity {
                     sts.setImageResource(R.drawable.cross);
                     msg.setText("Unknown Face");
                 }
-                if (toast.getVisibility() == View.GONE)
+                if (show) {
                     toast.setVisibility(View.VISIBLE);
-                toast.bringToFront();
-                new Handler().postDelayed(() -> toast.setVisibility(View.GONE), 5000);
+                    toast.bringToFront();
+                    new Handler().postDelayed(() -> toast.setVisibility(View.GONE), 3000);
+                }
             }
         }
     }
